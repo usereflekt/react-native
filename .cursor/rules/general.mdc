@@ -1,0 +1,29 @@
+---
+alwaysApply: true
+---
+# PROJECT OVERVIEW
+Reflekt is an in-app survey and feedback tool for mobile apps. This is the React Native and Expo SDK for Reflekt.
+
+# TECH STACK
+
+## FRONTEND
+TypeScript
+React Native
+
+## BACKEND
+Convex
+Better Auth
+
+# Debugging Process
+Unless absultely sure what the issue/bug is, use this process for debugging issues.
+1. Analyze the provided information
+2. Ask for more information if you are missing something
+3. Add logging to the relavant code
+4. Ask the user to run a test and provide you with the logs
+5. Analyze the new logs
+6. If you have found the couse of the bug, fix it and remove all logging, if not repeat from step 1.
+
+
+# IMPORTANT
+- All files names should use kebab-case
+- Always use the components in the @components/ui folder. If a needed component does not exist create the component.

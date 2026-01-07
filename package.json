@@ -1,0 +1,39 @@
+{
+  "name": "@reflekt/react-native",
+  "version": "1.0.0",
+  "description": "In-app survey SDK for React Native",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "jest"
+  },
+  "keywords": [
+    "survey",
+    "feedback",
+    "react-native",
+    "mobile"
+  ],
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-native": ">=0.64.0"
+  },
+  "dependencies": {
+    "react": ">=17.0.0",
+    "react-native": ">=0.64.0",
+    "react-native-gesture-handler": "^2.29.1",
+    "react-native-reanimated": "^4.1.5",
+    "react-native-svg": "^15.15.0"
+  },
+  "devDependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@types/react": "^19.2.5",
+    "@types/react-native": "^0.73.0",
+    "typescript": "^5.9.3"
+  },
+  "files": [
+    "lib",
+    "README.md"
+  ]
+}
