@@ -1,119 +1,39 @@
-import { StyleSheet, TouchableOpacity, View, Alert, ScrollView } from 'react-native';
-import { useReflekt, ReflektSDK, Survey } from '@reflekt/react-native';
-import { useState, useCallback } from 'react';
-
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { StyleSheet, View, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-  const { isReady } = useReflekt();
-  const [surveys, setSurveys] = useState<Survey[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const handleReloadSurveys = useCallback(async () => {
-    setLoading(true);
-    try {
-      const sdk = ReflektSDK.getInstance();
-      const available = await sdk.reloadAvailableSurveys();
-      setSurveys(available);
-      Alert.alert('Surveys Loaded', `Found ${available.length} available survey(s)`);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to load surveys. Check console for details.');
-      console.error('Failed to load surveys:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  const insets = useSafeAreaInsets();
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <ThemedView style={styles.header}>
-        <ThemedText type="title">Reflekt SDK Demo</ThemedText>
-        <ThemedText style={styles.subtitle}>
-          Test and develop the Reflekt Survey SDK
-        </ThemedText>
-      </ThemedView>
-
-      {/* SDK Status Section */}
-      <ThemedView style={styles.section}>
-        <ThemedText type="subtitle">SDK Status</ThemedText>
-        <View style={styles.statusRow}>
-          <ThemedText>Ready:</ThemedText>
-          <View style={[styles.statusIndicator, isReady ? styles.statusReady : styles.statusNotReady]} />
-          <ThemedText>{isReady ? 'Yes' : 'No'}</ThemedText>
+    <ScrollView style={[{ paddingTop: insets.top }, styles.container]}>
+      {/* Header Skeleton */}
+      <View style={styles.header}>
+        <View style={styles.headerAvatar} />
+        <View style={styles.headerText}>
+          <View style={styles.headerTitle} />
+          <View style={styles.headerSubtitle} />
         </View>
-      </ThemedView>
+      </View>
 
-      {/* Actions Section */}
-      <ThemedView style={styles.section}>
-        <ThemedText type="subtitle">Actions</ThemedText>
-        
-        <TouchableOpacity 
-          style={[styles.button, styles.primaryButton]}
-          onPress={handleReloadSurveys}
-          disabled={loading || !isReady}
-        >
-          <ThemedText style={styles.buttonText}>
-            {loading ? 'Loading...' : 'Reload Surveys'}
-          </ThemedText>
-        </TouchableOpacity>
-
-        <ThemedText style={styles.helpText}>
-          This will fetch available surveys from the API
-        </ThemedText>
-      </ThemedView>
-
-      {/* Available Surveys Section */}
-      <ThemedView style={styles.section}>
-        <ThemedText type="subtitle">Available Surveys ({surveys.length})</ThemedText>
-        
-        {surveys.length === 0 ? (
-          <ThemedText style={styles.emptyText}>
-            No surveys available. Tap &quot;Reload Surveys&quot; or configure your API key in _layout.tsx
-          </ThemedText>
-        ) : (
-          surveys.map((survey) => (
-            <View key={survey._id} style={styles.surveyCard}>
-              <ThemedText type="defaultSemiBold">{survey.title}</ThemedText>
-              {survey.description && (
-                <ThemedText style={styles.surveyDescription}>{survey.description}</ThemedText>
-              )}
-              <ThemedText style={styles.surveyMeta}>
-                {survey.questions.length} question(s) • Status: {survey.status}
-              </ThemedText>
+      {/* Content Cards */}
+      <View style={styles.content}>
+        {[1, 2, 3, 4, 5].map((item) => (
+          <View key={item} style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View style={styles.avatar} />
+              <View style={styles.cardTitle} />
             </View>
-          ))
-        )}
-      </ThemedView>
-
-      {/* Instructions Section */}
-      <ThemedView style={styles.section}>
-        <ThemedText type="subtitle">Getting Started</ThemedText>
-        <View style={styles.instructionStep}>
-          <ThemedText type="defaultSemiBold">1. Configure API Key</ThemedText>
-          <ThemedText>
-            Open app/_layout.tsx and replace YOUR_API_KEY with your actual API key
-          </ThemedText>
-        </View>
-        <View style={styles.instructionStep}>
-          <ThemedText type="defaultSemiBold">2. Set Respondent ID</ThemedText>
-          <ThemedText>
-            Replace the respondentId with your user&apos;s unique identifier
-          </ThemedText>
-        </View>
-        <View style={styles.instructionStep}>
-          <ThemedText type="defaultSemiBold">3. Create Surveys</ThemedText>
-          <ThemedText>
-            Create surveys in your Reflekt dashboard and set them to &quot;active&quot;
-          </ThemedText>
-        </View>
-        <View style={styles.instructionStep}>
-          <ThemedText type="defaultSemiBold">4. Enable Auto-Show (optional)</ThemedText>
-          <ThemedText>
-            Set autoShow: true in the config to automatically display surveys
-          </ThemedText>
-        </View>
-      </ThemedView>
+            <View style={styles.cardContent}>
+              <View style={styles.textLine} />
+              <View style={[styles.textLine, styles.textLineShort]} />
+              <View style={[styles.textLine, styles.textLineMedium]} />
+            </View>
+            <View style={styles.cardFooter}>
+              <View style={styles.button} />
+              <View style={styles.button} />
+            </View>
+          </View>
+        ))}
+      </View>
     </ScrollView>
   );
 }
@@ -121,78 +41,95 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  contentContainer: {
-    padding: 20,
-    paddingTop: 60,
+    backgroundColor: '#171717',
   },
   header: {
-    marginBottom: 24,
-  },
-  subtitle: {
-    opacity: 0.7,
-    marginTop: 4,
-  },
-  section: {
-    marginBottom: 24,
-    gap: 12,
-  },
-  statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    padding: 20,
+    marginBottom: 10,
   },
-  statusIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+  headerAvatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#333333',
   },
-  statusReady: {
-    backgroundColor: '#4CAF50',
+  headerText: {
+    marginLeft: 15,
+    flex: 1,
   },
-  statusNotReady: {
-    backgroundColor: '#F44336',
+  headerTitle: {
+    height: 24,
+    width: '70%',
+    backgroundColor: '#333333',
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  headerSubtitle: {
+    height: 16,
+    width: '50%',
+    backgroundColor: '#333333',
+    borderRadius: 4,
+  },
+  content: {
+    padding: 10,
+  },
+  card: {
+    backgroundColor: '#333333',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#444444',
+  },
+  cardTitle: {
+    height: 20,
+    width: '60%',
+    backgroundColor: '#444444',
+    borderRadius: 4,
+    marginLeft: 12,
+  },
+  cardContent: {
+    marginBottom: 16,
+  },
+  textLine: {
+    height: 14,
+    backgroundColor: '#444444',
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  textLineShort: {
+    width: '40%',
+  },
+  textLineMedium: {
+    width: '70%',
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   button: {
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  primaryButton: {
-    backgroundColor: '#6366F1',
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  helpText: {
-    fontSize: 13,
-    opacity: 0.6,
-  },
-  emptyText: {
-    opacity: 0.6,
-    fontStyle: 'italic',
-  },
-  surveyCard: {
-    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-    padding: 16,
-    borderRadius: 10,
-    gap: 4,
-  },
-  surveyDescription: {
-    opacity: 0.8,
-  },
-  surveyMeta: {
-    fontSize: 12,
-    opacity: 0.6,
-    marginTop: 4,
-  },
-  instructionStep: {
-    gap: 4,
-    paddingLeft: 12,
-    borderLeftWidth: 2,
-    borderLeftColor: '#6366F1',
+    height: 36,
+    width: '45%',
+    backgroundColor: '#444444',
+    borderRadius: 8,
   },
 });
