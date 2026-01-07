@@ -37,8 +37,10 @@ function getEmojiSize(range: number, availableWidth: number): { fontSize: number
 
   for (let fontSize = MAX_FONT_SIZE; fontSize >= MIN_FONT_SIZE; fontSize -= 2) {
     for (let gap = MAX_GAP; gap >= MIN_GAP; gap -= 2) {
-      const padding = Math.max(4, Math.min(12, fontSize / 4));
-      const buttonWidth = fontSize + padding * 2 + 2;
+      const padding = Math.max(4, Math.min(12, Math.round(fontSize / 4)));
+      const borderWidth = 1;
+      const buttonSize = fontSize + padding * 2;
+      const buttonWidth = buttonSize + borderWidth * 2;
       const totalWidth = buttonWidth * range + gap * (range - 1);
 
       if (totalWidth <= availableWidth) {
@@ -68,6 +70,7 @@ function getSmileySubset(range: SurveyRatingRange): string[] {
 
 export default function SurveyRatingQuestion({ question, answer, onAnswer }: SurveyRatingQuestionProps) {
   const [containerWidth, setContainerWidth] = useState(0);
+  const isLayoutReady = containerWidth > 0;
 
   const handleRating = (value: number) => {
     const current = answer?.answer;
@@ -87,12 +90,7 @@ export default function SurveyRatingQuestion({ question, answer, onAnswer }: Sur
 
   const renderRatingStars = () => {
     const range = question.ratingConfig?.range || 5;
-
-    if (containerWidth === 0) {
-      return <View style={styles.ratingContainer} />;
-    }
-
-    const { size, gap, padding } = getStarSize(range, containerWidth);
+    const { size, gap, padding } = getStarSize(range, containerWidth || 1);
     const stars = [];
 
     for (let i = 1; i <= range; i++) {
@@ -118,7 +116,11 @@ export default function SurveyRatingQuestion({ question, answer, onAnswer }: Sur
       );
     }
 
-    return <View style={[styles.ratingContainer, { gap }]}>{stars}</View>;
+    return (
+      <View style={[styles.ratingContainer, { gap }, !isLayoutReady && styles.hiddenWhileMeasuring]}>
+        {stars}
+      </View>
+    );
   };
 
   const renderRatingNumbers = () => {
@@ -150,14 +152,11 @@ export default function SurveyRatingQuestion({ question, answer, onAnswer }: Sur
     const range = question.ratingConfig?.range || 5;
     const emojis = getSmileySubset(range);
 
-    if (containerWidth === 0) {
-      return <View style={styles.ratingContainer} />;
-    }
-
-    const { fontSize, gap, padding } = getEmojiSize(range, containerWidth);
+    const { fontSize, gap, padding } = getEmojiSize(range, containerWidth || 1);
+    const buttonSize = fontSize + padding * 2;
 
     return (
-      <View style={[styles.ratingContainer, { gap }]}>
+      <View style={[styles.ratingContainer, { gap }, !isLayoutReady && styles.hiddenWhileMeasuring]}>
         {emojis.map((emoji, index) => {
           const value = index + 1;
           const isSelected = answer?.answer === value;
@@ -168,7 +167,7 @@ export default function SurveyRatingQuestion({ question, answer, onAnswer }: Sur
               style={[
                 styles.smileyButton,
                 isSelected && styles.smileyButtonSelected,
-                { padding },
+                { width: buttonSize, height: buttonSize },
               ]}
             >
               <Text style={{ fontSize }}>{emoji}</Text>
@@ -231,6 +230,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     flexWrap: "wrap",
   },
+  hiddenWhileMeasuring: {
+    opacity: 0,
+  },
   numberRatingContainer: {
     flexDirection: "row",
     borderRadius: 12,
@@ -266,6 +268,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(0, 0, 0, 0.12)",
     backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   smileyButtonSelected: {
     borderColor: "#171717",

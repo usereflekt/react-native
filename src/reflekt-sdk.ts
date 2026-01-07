@@ -76,7 +76,7 @@ class ReflektSDK {
   async submitResponse(surveyId: string, answers: SurveyAnswer[]): Promise<void> {
     const metadata = {
       platform: Platform.OS,
-      appVersion: this.config.appVersion || '1.0.0',
+      appVersion: this.config.appVersion || 'Unknown', // TODO: Get app version from package.json
       timestamp: Date.now(),
       startedAt: Date.now(),
       completedAt: Date.now(),

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  Keyboard,
   ScrollView,
   StyleSheet,
   Text,
@@ -83,6 +84,7 @@ const Survey: React.FC<SurveyProps> = ({
   };
 
   const handleNext = () => {
+    Keyboard.dismiss();
     if (isLastQuestion) {
       onSubmit(answers);
       onClose();
@@ -156,6 +158,7 @@ const Survey: React.FC<SurveyProps> = ({
     <ScrollView 
       style={styles.scrollView}
       contentContainerStyle={styles.scrollContent}
+      keyboardShouldPersistTaps="handled"
       bounces={isScrollable}
       alwaysBounceVertical={false}
       showsVerticalScrollIndicator={true}

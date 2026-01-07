@@ -140,28 +140,32 @@ const SurveyPopup: React.FC<SurveyPopupProps> = ({
 
   const panGesture = Gesture.Pan()
     .onStart(() => {
+      'worklet';
       dragOffset.value = translateY.value;
     })
     .onUpdate((event) => {
-      const nextY = dragOffset.value + event.translationY;
-      if (isKeyboardOpen.value > 0 && event.translationY > 20) {
-        runOnJS(dismissKeyboard)();
-      }
-      translateY.value = nextY;
+      'worklet';
+      translateY.value = dragOffset.value + event.translationY;
     })
     .onEnd((event) => {
+      'worklet';
       if (translateY.value <= 0) {
         translateY.value = withSpring(0, OPEN_SPRING_CONFIG);
         return;
       }
-
+      
+      const isKeyboardOpenValue = isKeyboardOpen.value > 0;
       const shouldCloseByPosition = translateY.value > sheetHeight.value * 0.6;
       const shouldCloseByFling =
         translateY.value > SCREEN_HEIGHT * 0.05 && event.velocityY > 1000;
 
+      if (isKeyboardOpenValue && event.translationY > 20) {
+        runOnJS(dismissKeyboard)();
+      }
+
       const shouldClose = shouldCloseByPosition || shouldCloseByFling;
 
-      if (shouldClose && isKeyboardOpen.value === 0) {
+      if (shouldClose && !isKeyboardOpenValue) {
         translateY.value = withTiming(
           SCREEN_HEIGHT,
           { duration: 200 },
@@ -179,8 +183,12 @@ const SurveyPopup: React.FC<SurveyPopupProps> = ({
   if (!isMounted) return null;
 
   const handleBackdropPress = () => {
-    Keyboard.dismiss();
-    onClose();
+    if (isKeyboardOpen.value > 0) {
+      Keyboard.dismiss();
+    }
+    else {
+      onClose();
+    }
   };
 
   return (
