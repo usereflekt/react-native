@@ -13,7 +13,7 @@ export interface Project {
     organizationId: string;
     platforms: ProjectPlatform[];
 }
-export type SurveyQuestionType = "free_text" | "multi_select" | "single_select" | "rating";
+export type SurveyQuestionType = "free_text" | "message" | "multi_select" | "single_select" | "rating";
 export interface SurveySelectOption {
     id: string;
     label: string;

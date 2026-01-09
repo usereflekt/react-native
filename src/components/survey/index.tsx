@@ -34,6 +34,7 @@ const Survey: React.FC<SurveyProps> = ({
   const isLastQuestion = currentQuestionIndex === survey.questions.length - 1;
 
   const hasValidAnswer = (question: SurveyQuestionType, answer?: SurveyAnswer) => {
+    if (question.type === 'message') return true;
     if (!answer) return false;
     const value = answer.answer;
 
@@ -123,6 +124,7 @@ const Survey: React.FC<SurveyProps> = ({
 
   const currentAnswer = answers[currentQuestionIndex];
   const hasResponse = (() => {
+    if (currentQuestion.type === 'message') return true;
     if (!currentAnswer) return false;
     const value = currentAnswer.answer;
     switch (currentQuestion.type) {
@@ -154,46 +156,46 @@ const Survey: React.FC<SurveyProps> = ({
   })();
 
   return (
-  <SurveyPopup visible={visible} onClose={onClose} length={survey.questions.length} current={currentQuestionIndex + 1}>
-    <ScrollView 
-      style={styles.scrollView}
-      contentContainerStyle={styles.scrollContent}
-      keyboardShouldPersistTaps="handled"
-      bounces={isScrollable}
-      alwaysBounceVertical={false}
-      showsVerticalScrollIndicator={true}
-      onLayout={handleScrollViewLayout}
-      onContentSizeChange={handleContentSizeChange}
-    >
-      <SurveyQuestion
-        question={currentQuestion}
-        answer={currentAnswer}
-        onAnswer={handleAnswer}
-      />
+    <SurveyPopup visible={visible} onClose={onClose} length={survey.questions.length} current={currentQuestionIndex + 1}>
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        bounces={isScrollable}
+        alwaysBounceVertical={false}
+        showsVerticalScrollIndicator={true}
+        onLayout={handleScrollViewLayout}
+        onContentSizeChange={handleContentSizeChange}
+      >
+        <SurveyQuestion
+          question={currentQuestion}
+          answer={currentAnswer}
+          onAnswer={handleAnswer}
+        />
 
-      <View style={styles.footer}>
-        <View style={{...styles.buttons, justifyContent: currentQuestionIndex > 0 ? 'space-between' : 'flex-end'}}>
-          {currentQuestionIndex > 0 && (
+        <View style={styles.footer}>
+          <View style={{...styles.buttons, justifyContent: currentQuestionIndex > 0 ? 'space-between' : 'flex-end'}}>
+            {currentQuestionIndex > 0 && (
+              <TouchableOpacity
+                style={[styles.button, styles.secondaryButton]}
+                onPress={handleBack}
+              >
+                <Text style={styles.secondaryButtonText}>Back</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
-              style={[styles.button, styles.secondaryButton]}
-              onPress={handleBack}
+              style={[styles.button, styles.primaryButton, isNextDisabled && styles.buttonDisabled]}
+              onPress={handleNext}
+              disabled={isNextDisabled}
             >
-              <Text style={styles.secondaryButtonText}>Back</Text>
+              <Text style={styles.primaryButtonText}>
+                {nextLabel}
+              </Text>
             </TouchableOpacity>
-          )}
-          <TouchableOpacity
-            style={[styles.button, styles.primaryButton, isNextDisabled && styles.buttonDisabled]}
-            onPress={handleNext}
-            disabled={isNextDisabled}
-          >
-            <Text style={styles.primaryButtonText}>
-              {nextLabel}
-            </Text>
-          </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </ScrollView>
-  </SurveyPopup>
+      </ScrollView>
+    </SurveyPopup>
   );
 };
 

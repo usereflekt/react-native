@@ -35,6 +35,7 @@ export interface Project {
 
 export type SurveyQuestionType =
   | "free_text"
+  | "message"
   | "multi_select"
   | "single_select"
   | "rating";

@@ -1,9 +1,10 @@
 import React from "react";
 import { SurveyAnswer, SurveyQuestion as SurveyQuestionType } from "../../../types";
-import SurveyFreeTextQuestion from "./free-text-question";
-import SurveyMultiSelectQuestion from "./multi-select-question";
-import SurveyRatingQuestion from "./rating-question";
-import SurveySingleSelectQuestion from "./single-select-question";
+import SurveyFreeTextQuestion from "./free-text";
+import SurveyMultiSelectQuestion from "./multi-select";
+import SurveyRatingQuestion from "./rating";
+import SurveySingleSelectQuestion from "./single-select";
+import SurveyMessageQuestion from "./message";
 
 export interface SurveyQuestionProps {
   question: SurveyQuestionType;
@@ -24,6 +25,12 @@ export default function SurveyQuestion({
           question={question}
           answer={answer}
           onAnswer={onAnswer}
+        />
+      );
+    case "message":
+      return (
+        <SurveyMessageQuestion
+          question={question}
         />
       );
     case "single_select":
