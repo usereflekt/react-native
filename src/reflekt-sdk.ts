@@ -94,7 +94,10 @@ class ReflektSDK {
       completedAt: Date.now(),
     };
 
-    await this.apiClient.submitResponse(surveyId, this.config.respondentId, answers, metadata);
+    // Filter out undefined answers (skipped questions or message questions)
+    const validAnswers = answers.filter((answer): answer is SurveyAnswer => answer !== undefined);
+
+    await this.apiClient.submitResponse(surveyId, this.config.respondentId, validAnswers, metadata);
     
     await this.markSurveyCompleted(surveyId);
   }
