@@ -12,6 +12,24 @@ export interface Project {
     slug: string;
     organizationId: string;
     platforms: ProjectPlatform[];
+    theme: Theme;
+}
+export interface ThemeColors {
+    background: string;
+    text: string;
+    textSecondary: string;
+    primary: string;
+    primaryForeground: string;
+}
+export interface ThemeBorderRadius {
+    sheet: number;
+    button: number;
+    option: number;
+    input: number;
+}
+export interface Theme {
+    colors: ThemeColors;
+    borderRadius: ThemeBorderRadius;
 }
 export type SurveyQuestionType = "free_text" | "message" | "multi_select" | "single_select" | "rating";
 export interface SurveySelectOption {

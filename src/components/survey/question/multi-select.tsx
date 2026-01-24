@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
+import { useTheme } from "../../../theme";
+import { createOptionStyles, createQuestionStyles } from "../../../theme/question-styles";
 import { SurveyAnswer, SurveyQuestion as SurveyQuestionType } from "../../../types";
 
 interface SurveyMultiSelectQuestionProps {
@@ -14,7 +16,26 @@ export default function SurveyMultiSelectQuestion({
   answer,
   onAnswer,
 }: SurveyMultiSelectQuestionProps) {
+  const theme = useTheme();
+  const questionStyles = useMemo(() => createQuestionStyles(theme), [theme]);
+  const optionStyles = useMemo(() => createOptionStyles(theme), [theme]);
   const [otherText, setOtherText] = useState(answer?.otherText ?? "");
+
+  const themedStyles = useMemo(() => StyleSheet.create({
+    checkbox: {
+      width: 24,
+      height: 24,
+      borderRadius: 6,
+      borderWidth: 2,
+      borderColor: theme.colors.textSecondary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    checkboxSelected: {
+      borderColor: theme.colors.primary,
+      backgroundColor: theme.colors.primary,
+    },
+  }), [theme]);
 
   const handleMultiSelect = (optionId: string) => {
     const currentAnswers = Array.isArray(answer?.answer) ? answer.answer : [];
@@ -49,21 +70,21 @@ export default function SurveyMultiSelectQuestion({
     return (
       <TouchableOpacity
         onPress={onPress}
-        style={[styles.option, isSelected && styles.optionSelected]}
+        style={[optionStyles.option, isSelected && optionStyles.optionSelected]}
       >
         <View
           style={[
-            styles.checkbox,
-            isSelected && styles.checkboxSelected,
+            themedStyles.checkbox,
+            isSelected && themedStyles.checkboxSelected,
           ]}
         >
           {isSelected && (
-            <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+            <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={theme.colors.primaryForeground} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
               <Path d="M20 6 9 17l-5-5" />
             </Svg>
           )}
         </View>
-        <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+        <Text style={[optionStyles.optionText, isSelected && optionStyles.optionTextSelected]}>
           {label}
         </Text>
       </TouchableOpacity>
@@ -71,12 +92,12 @@ export default function SurveyMultiSelectQuestion({
   }
 
   return (
-    <View style={styles.questionContainer}>
-      <Text style={styles.questionLabel}>{question.label}</Text>
+    <View style={questionStyles.questionContainer}>
+      <Text style={questionStyles.questionLabel}>{question.label}</Text>
       {question.description && (
-        <Text style={styles.questionDescription}>{question.description}</Text>
+        <Text style={questionStyles.questionDescription}>{question.description}</Text>
       )}
-      <View style={styles.optionsContainer}>
+      <View style={optionStyles.optionsContainer}>
         {options.map((option) => 
           <CheckBoxOption 
             key={option.id}
@@ -94,7 +115,7 @@ export default function SurveyMultiSelectQuestion({
             />
             {currentAnswers.includes("other") && (
               <TextInput
-                style={styles.otherInput}
+                style={optionStyles.otherInput}
                 value={otherText}
                 onChangeText={(text) => {
                   setOtherText(text);
@@ -107,7 +128,7 @@ export default function SurveyMultiSelectQuestion({
                   });
                 }}
                 placeholder="Please specify..."
-                placeholderTextColor="#8e8e93"
+                placeholderTextColor={theme.colors.textSecondary}
               />
             )}
           </View>
@@ -117,74 +138,5 @@ export default function SurveyMultiSelectQuestion({
   );
 }
 
-const styles = StyleSheet.create({
-  questionContainer: {
-    gap: 16,
-  },
-  questionLabel: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#171717",
-    lineHeight: 24,
-  },
-  questionDescription: {
-    fontSize: 14,
-    color: "#8e8e93",
-    lineHeight: 20,
-    marginTop: -8,
-  },
-  optionsContainer: {
-    gap: 8,
-  },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "rgba(0, 0, 0, 0.12)",
-    backgroundColor: "#ffffff",
-    gap: 12,
-  },
-  optionSelected: {
-    borderColor: "#171717",
-    backgroundColor: "rgba(0, 0, 0, 0.02)",
-  },
-  optionText: {
-    fontSize: 16,
-    color: "#171717",
-    flex: 1,
-  },
-  optionTextSelected: {
-    fontWeight: "500",
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: "#8e8e93",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  checkboxSelected: {
-    borderColor: "#171717",
-    backgroundColor: "#171717",
-  },
-  checkmark: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#ffffff",
-  },
-  otherInput: {
-    borderWidth: 1,
-    borderColor: "rgba(0, 0, 0, 0.12)",
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
-    color: "#171717",
-    marginTop: 8,
-  },
-});
 
 

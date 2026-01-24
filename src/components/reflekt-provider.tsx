@@ -6,7 +6,8 @@ import React, {
   useState,
 } from "react";
 import ReflektSDK from "../reflekt-sdk";
-import { SDKConfig, Survey as SurveyType, SurveyAnswer } from "../types";
+import { DEFAULT_THEME, ThemeProvider } from "../theme";
+import { SDKConfig, Survey as SurveyType, SurveyAnswer, Theme } from "../types";
 import Survey from "./survey";
 
 
@@ -30,6 +31,7 @@ export const ReflektProvider: React.FC<ReflektProviderProps> = ({
   const [isReady, setIsReady] = useState(false);
   const [activeSurvey, setActiveSurvey] = useState<SurveyType | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [theme, setTheme] = useState<Theme>(DEFAULT_THEME);
 
   useEffect(() => {
     let isMounted = true;
@@ -37,6 +39,8 @@ export const ReflektProvider: React.FC<ReflektProviderProps> = ({
       try {
         await ReflektSDK.initialize(config);
         if (isMounted) {
+          const sdk = ReflektSDK.getInstance();
+          setTheme(sdk.getTheme());
           setIsReady(true);
         }
       } catch (error) {
@@ -97,6 +101,10 @@ export const ReflektProvider: React.FC<ReflektProviderProps> = ({
         const available = await sdk.reloadAvailableSurveys();
 
         if (!isMounted) return;
+
+        // Update theme after reload
+        setTheme(sdk.getTheme());
+
         if (!available.length) return;
 
         if (activeSurvey || isVisible) {
@@ -149,15 +157,17 @@ export const ReflektProvider: React.FC<ReflektProviderProps> = ({
 
   return (
     <ReflektContext.Provider value={contextValue}>
-      {children}
-      {activeSurvey && (
-        <Survey
-          survey={activeSurvey}
-          visible={isVisible}
-          onClose={hideSurvey}
-          onSubmit={handleSubmit}
-        />
-      )}
+      <ThemeProvider theme={theme}>
+        {children}
+        {activeSurvey && (
+          <Survey
+            survey={activeSurvey}
+            visible={isVisible}
+            onClose={hideSurvey}
+            onSubmit={handleSubmit}
+          />
+        )}
+      </ThemeProvider>
     </ReflektContext.Provider>
   );
 };

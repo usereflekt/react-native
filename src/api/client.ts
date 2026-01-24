@@ -3,7 +3,8 @@ import {
   ImpressionMetadata,
   Survey,
   SurveyAnswer,
-  SurveyResponseMetadata
+  SurveyResponseMetadata,
+  Theme
 } from '../types';
 
 export class APIClient {
@@ -15,7 +16,7 @@ export class APIClient {
     this.apiKey = apiKey;
   }
 
-  async fetchActiveSurveys(): Promise<Survey[]> {
+  async fetchActiveSurveys(): Promise<{ surveys: Survey[], theme: Theme }> {
     const response = await fetch(`${this.apiUrl}/surveys/active`, {
       method: 'GET',
       headers: {
@@ -29,7 +30,7 @@ export class APIClient {
     }
 
     const data = await response.json();
-    return data.surveys;
+    return { surveys: data.surveys, theme: data.theme };
   }
 
   async submitResponse(

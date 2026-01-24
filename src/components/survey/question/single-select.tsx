@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useTheme } from "../../../theme";
+import { createOptionStyles, createQuestionStyles } from "../../../theme/question-styles";
 import { SurveyAnswer, SurveyQuestion as SurveyQuestionType } from "../../../types";
 
 interface SurveySingleSelectQuestionProps {
@@ -13,7 +15,28 @@ export default function SurveySingleSelectQuestion({
   answer,
   onAnswer,
 }: SurveySingleSelectQuestionProps) {
+  const theme = useTheme();
+  const questionStyles = useMemo(() => createQuestionStyles(theme), [theme]);
+  const optionStyles = useMemo(() => createOptionStyles(theme), [theme]);
   const [otherText, setOtherText] = useState(answer?.otherText ?? "");
+
+  const themedStyles = useMemo(() => StyleSheet.create({
+    radio: {
+      width: 16,
+      height: 16,
+      borderRadius: 10,
+      borderWidth: 2,
+      borderColor: theme.colors.textSecondary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    radioInner: {
+      width: 16,
+      height: 16,
+      borderRadius: 10,
+      backgroundColor: theme.colors.primary,
+    },
+  }), [theme]);
 
   const handleSingleSelect = (optionId: string) => {
     const current = answer?.answer;
@@ -53,24 +76,24 @@ export default function SurveySingleSelectQuestion({
   const allowOther = question.selectConfig?.allowOther || false;
 
   return (
-    <View style={styles.questionContainer}>
-      <Text style={styles.questionLabel}>{question.label}</Text>
+    <View style={questionStyles.questionContainer}>
+      <Text style={questionStyles.questionLabel}>{question.label}</Text>
       {question.description && (
-        <Text style={styles.questionDescription}>{question.description}</Text>
+        <Text style={questionStyles.questionDescription}>{question.description}</Text>
       )}
-      <View style={styles.optionsContainer}>
+      <View style={optionStyles.optionsContainer}>
         {options.map((option) => {
           const isSelected = answer?.answer === option.id;
           return (
             <TouchableOpacity
               key={option.id}
               onPress={() => handleSingleSelect(option.id)}
-              style={[styles.option, isSelected && styles.optionSelected]}
+              style={[optionStyles.option, isSelected && optionStyles.optionSelected]}
             >
-              <View style={styles.radio}>
-                {isSelected && <View style={styles.radioInner} />}
+              <View style={themedStyles.radio}>
+                {isSelected && <View style={themedStyles.radioInner} />}
               </View>
-              <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+              <Text style={[optionStyles.optionText, isSelected && optionStyles.optionTextSelected]}>
                 {option.label}
               </Text>
             </TouchableOpacity>
@@ -81,17 +104,17 @@ export default function SurveySingleSelectQuestion({
             <TouchableOpacity
               onPress={handleOtherSelect}
               style={[
-                styles.option,
-                answer?.answer === "other" && styles.optionSelected,
+                optionStyles.option,
+                answer?.answer === "other" && optionStyles.optionSelected,
               ]}
             >
-              <View style={styles.radio}>
-                {answer?.answer === "other" && <View style={styles.radioInner} />}
+              <View style={themedStyles.radio}>
+                {answer?.answer === "other" && <View style={themedStyles.radioInner} />}
               </View>
               <Text
                 style={[
-                  styles.optionText,
-                  answer?.answer === "other" && styles.optionTextSelected,
+                  optionStyles.optionText,
+                  answer?.answer === "other" && optionStyles.optionTextSelected,
                 ]}
               >
                 Other
@@ -99,7 +122,7 @@ export default function SurveySingleSelectQuestion({
             </TouchableOpacity>
             {answer?.answer === "other" && (
               <TextInput
-                style={styles.otherInput}
+                style={optionStyles.otherInput}
                 value={otherText}
                 onChangeText={(text) => {
                   setOtherText(text);
@@ -110,7 +133,7 @@ export default function SurveySingleSelectQuestion({
                   });
                 }}
                 placeholder="Please specify..."
-                placeholderTextColor="#8e8e93"
+                placeholderTextColor={theme.colors.textSecondary}
               />
             )}
           </View>
@@ -120,71 +143,5 @@ export default function SurveySingleSelectQuestion({
   );
 }
 
-const styles = StyleSheet.create({
-  questionContainer: {
-    gap: 16,
-  },
-  questionLabel: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#171717",
-    lineHeight: 24,
-  },
-  questionDescription: {
-    fontSize: 14,
-    color: "#8e8e93",
-    lineHeight: 20,
-    marginTop: -8,
-  },
-  optionsContainer: {
-    gap: 8,
-  },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "rgba(0, 0, 0, 0.12)",
-    backgroundColor: "#ffffff",
-    gap: 12,
-  },
-  optionSelected: {
-    borderColor: "#171717",
-    backgroundColor: "rgba(0, 0, 0, 0.02)",
-  },
-  optionText: {
-    fontSize: 16,
-    color: "#171717",
-    flex: 1,
-  },
-  optionTextSelected: {
-    fontWeight: "500",
-  },
-  radio: {
-    width: 16,
-    height: 16,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#8e8e93",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  radioInner: {
-    width: 16,
-    height: 16,
-    borderRadius: 10,
-    backgroundColor: "#171717",
-  },
-  otherInput: {
-    borderWidth: 1,
-    borderColor: "rgba(0, 0, 0, 0.12)",
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
-    color: "#171717",
-    marginTop: 8,
-  },
-});
 
 

@@ -27,6 +27,27 @@ export interface Project {
   slug: string;
   organizationId: string;
   platforms: ProjectPlatform[];
+  theme: Theme
+}
+
+export interface ThemeColors {
+  background: string;        // Sheet/surface/inputs background
+  text: string;              // Primary text, labels
+  textSecondary: string;     // Descriptions, placeholders
+  primary: string;           // Accent, selected states, buttons
+  primaryForeground: string; // Text on primary buttons
+}
+
+export interface ThemeBorderRadius {
+  sheet: number;   // Modal sheet corners
+  button: number;  // Button corners
+  option: number;  // Option corners
+  input: number;   // Input/option corners
+}
+
+export interface Theme {
+  colors: ThemeColors;
+  borderRadius: ThemeBorderRadius;
 }
 
 // ---------

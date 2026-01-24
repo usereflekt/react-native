@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Dimensions,
   Keyboard,
@@ -22,6 +22,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
+import { useTheme, withOpacity } from '../../theme';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -47,7 +48,44 @@ const SurveyPopup: React.FC<SurveyPopupProps> = ({
   length = 0,
   current = 0,
 }) => {
+  const theme = useTheme();
   const [isMounted, setIsMounted] = useState(visible);
+
+  // Generate dynamic styles based on theme
+  const themedStyles = useMemo(() => StyleSheet.create({
+    sheet: {
+      borderRadius: theme.borderRadius.sheet,
+      paddingTop: 12,
+      backgroundColor: theme.colors.background,
+      maxHeight: SCREEN_HEIGHT * 0.85,
+      overflow: 'hidden',
+      gap: 12,
+    },
+    progressText: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+    },
+    progressTrack: {
+      flex: 1,
+      height: 6,
+      borderRadius: 2,
+      backgroundColor: withOpacity(theme.colors.primary, 0.08),
+      overflow: 'hidden',
+    },
+    progressFill: {
+      height: '100%',
+      borderRadius: 2,
+      backgroundColor: theme.colors.primary,
+    },
+    closeButton: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: withOpacity(theme.colors.primary, 0.06),
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  }), [theme]);
 
   const translateY = useSharedValue(SCREEN_HEIGHT);
   const dragOffset = useSharedValue(0);
@@ -204,35 +242,35 @@ const SurveyPopup: React.FC<SurveyPopupProps> = ({
         <GestureDetector gesture={panGesture}>
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <Animated.View
-              style={[styles.sheet, sheetStyle]}
+              style={[themedStyles.sheet, sheetStyle]}
               onLayout={(event) => {
                 sheetHeight.value = event.nativeEvent.layout.height;
               }}
             >
               <View style={styles.headerContainer}>
-                <Text style={styles.progressText}>
+                <Text style={themedStyles.progressText}>
                   {current} of {length}
                 </Text>
-                <View style={styles.progressTrack}>
+                <View style={themedStyles.progressTrack}>
                   <Animated.View
-                    style={[styles.progressFill, progressAnimatedStyle]}
+                    style={[themedStyles.progressFill, progressAnimatedStyle]}
                   />
                 </View>
                 <Pressable
-                  style={styles.closeButton}
+                  style={themedStyles.closeButton}
                   onPress={onClose}
                   hitSlop={12}
                 >
                   <Svg width={14} height={14} viewBox="0 0 12 12">
                     <Path
                       d="M3 3L9 9"
-                      stroke="#8e8e93"
+                      stroke={theme.colors.textSecondary}
                       strokeWidth={1.5}
                       strokeLinecap="round"
                     />
                     <Path
                       d="M9 3L3 9"
-                      stroke="#8e8e93"
+                      stroke={theme.colors.textSecondary}
                       strokeWidth={1.5}
                       strokeLinecap="round"
                     />
@@ -251,8 +289,8 @@ const SurveyPopup: React.FC<SurveyPopupProps> = ({
                         x2="0"
                         y2="1"
                       >
-                        <Stop offset="0" stopColor="#ffffff" stopOpacity="0" />
-                        <Stop offset="1" stopColor="#ffffff" stopOpacity="1" />
+                        <Stop offset="0" stopColor={theme.colors.background} stopOpacity="0" />
+                        <Stop offset="1" stopColor={theme.colors.background} stopOpacity="1" />
                       </LinearGradient>
                     </Defs>
                     <Rect
@@ -273,24 +311,17 @@ const SurveyPopup: React.FC<SurveyPopupProps> = ({
   );
 };
 
+// Static styles that don't depend on theme
 const styles = StyleSheet.create({
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   bottomContainer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'flex-end',
     paddingBottom: 24,
     paddingHorizontal: 20,
-  },
-  sheet: {
-    borderRadius: 24,
-    paddingTop: 12,
-    backgroundColor: '#ffffff',
-    maxHeight: SCREEN_HEIGHT * 0.85,
-    overflow: 'hidden',
-    gap: 12,
   },
   contentContainer: {
     paddingHorizontal: 0,
@@ -304,30 +335,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     gap: 12,
-  },
-  progressText: {
-    fontSize: 12,
-    color: '#8e8e93',
-  },
-  progressTrack: {
-    flex: 1,
-    height: 6,
-    borderRadius: 2,
-    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 2,
-    backgroundColor: '#000000',
-  },
-  closeButton: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.06)',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   bottomGradient: {
     position: 'absolute',

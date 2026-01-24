@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
+import { useTheme, withOpacity } from "../../../theme";
+import { createQuestionStyles } from "../../../theme/question-styles";
 import { SurveyAnswer, SurveyQuestion as SurveyQuestionType, SurveyRatingRange } from "../../../types";
 
 interface SurveyRatingQuestionProps {
@@ -69,8 +71,65 @@ function getSmileySubset(range: SurveyRatingRange): string[] {
 }
 
 export default function SurveyRatingQuestion({ question, answer, onAnswer }: SurveyRatingQuestionProps) {
+  const theme = useTheme();
+  const questionStyles = useMemo(() => createQuestionStyles(theme), [theme]);
   const [containerWidth, setContainerWidth] = useState(0);
   const isLayoutReady = containerWidth > 0;
+
+  // Derived colors
+  const ratingInactive = withOpacity(theme.colors.primary, 0.25);
+  const borderColor = withOpacity(theme.colors.primary, 0.12);
+  const selectedBg = withOpacity(theme.colors.primary, 0.02);
+
+  const themedStyles = useMemo(() => StyleSheet.create({
+    numberRatingContainer: {
+      flexDirection: "row",
+      borderRadius: theme.borderRadius.option,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: borderColor,
+      gap: 0,
+    },
+    numberButton: {
+      flex: 1,
+      height: 44,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.colors.background,
+    },
+    numberButtonDivider: {
+      borderRightWidth: 1,
+      borderRightColor: borderColor,
+    },
+    numberButtonSelected: {
+      backgroundColor: theme.colors.primary,
+    },
+    numberText: {
+      fontSize: 16,
+      fontWeight: "500",
+      color: theme.colors.text,
+    },
+    numberTextSelected: {
+      color: theme.colors.primaryForeground,
+    },
+    smileyButton: {
+      borderRadius: theme.borderRadius.option,
+      borderWidth: 1,
+      borderColor: borderColor,
+      backgroundColor: theme.colors.background,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    smileyButtonSelected: {
+      borderColor: theme.colors.primary,
+      borderWidth: 1,
+      backgroundColor: selectedBg,
+    },
+    ratingLabel: {
+      fontSize: 12,
+      color: theme.colors.textSecondary,
+    },
+  }), [theme, borderColor, selectedBg]);
 
   const handleRating = (value: number) => {
     const current = answer?.answer;
@@ -104,7 +163,7 @@ export default function SurveyRatingQuestion({ question, answer, onAnswer }: Sur
         >
           <Svg width={size} height={size} viewBox="0 0 256 256">
             <Path
-              fill={isSelected ? "#171717" : "#d1d1d6"}
+              fill={isSelected ? theme.colors.primary : ratingInactive}
               d={
                 isSelected
                   ? "M239.18,97.26A16.38,16.38,0,0,0,224.92,86l-59-4.76L143.14,26.15a16.36,16.36,0,0,0-30.27,0L90.11,81.23,31.08,86a16.46,16.46,0,0,0-9.37,28.86l45,38.83L53,211.75a16.38,16.38,0,0,0,24.5,17.82L128,198.49l50.53,31.08A16.4,16.4,0,0,0,203,211.75l-13.76-58.07,45-38.83A16.43,16.43,0,0,0,239.18,97.26Z"
@@ -135,17 +194,17 @@ export default function SurveyRatingQuestion({ question, answer, onAnswer }: Sur
           key={i}
           onPress={() => handleRating(i)}
           style={[
-            styles.numberButton,
-            !isLast && styles.numberButtonDivider,
-            isSelected && styles.numberButtonSelected,
+            themedStyles.numberButton,
+            !isLast && themedStyles.numberButtonDivider,
+            isSelected && themedStyles.numberButtonSelected,
           ]}
         >
-          <Text style={[styles.numberText, isSelected && styles.numberTextSelected]}>{i}</Text>
+          <Text style={[themedStyles.numberText, isSelected && themedStyles.numberTextSelected]}>{i}</Text>
         </Pressable>
       );
     }
 
-    return <View style={styles.numberRatingContainer}>{numbers}</View>;
+    return <View style={themedStyles.numberRatingContainer}>{numbers}</View>;
   };
 
   const renderRatingSmiley = () => {
@@ -165,8 +224,8 @@ export default function SurveyRatingQuestion({ question, answer, onAnswer }: Sur
               key={value}
               onPress={() => handleRating(value)}
               style={[
-                styles.smileyButton,
-                isSelected && styles.smileyButtonSelected,
+                themedStyles.smileyButton,
+                isSelected && themedStyles.smileyButtonSelected,
                 { width: buttonSize, height: buttonSize },
               ]}
             >
@@ -182,7 +241,7 @@ export default function SurveyRatingQuestion({ question, answer, onAnswer }: Sur
 
   return (
     <View
-      style={styles.questionContainer}
+      style={questionStyles.questionContainer}
       onLayout={(event) => {
         const { width } = event.nativeEvent.layout;
         if (width > 0 && containerWidth !== width) {
@@ -190,9 +249,9 @@ export default function SurveyRatingQuestion({ question, answer, onAnswer }: Sur
         }
       }}
     >
-      <Text style={styles.questionLabel}>{question.label}</Text>
+      <Text style={questionStyles.questionLabel}>{question.label}</Text>
       {question.description && (
-        <Text style={styles.questionDescription}>{question.description}</Text>
+        <Text style={questionStyles.questionDescription}>{question.description}</Text>
       )}
 
       {scale === "stars" && renderRatingStars()}
@@ -201,30 +260,16 @@ export default function SurveyRatingQuestion({ question, answer, onAnswer }: Sur
 
       {question.ratingConfig?.lowerLabel && question.ratingConfig?.upperLabel && (
         <View style={styles.ratingLabels}>
-          <Text style={styles.ratingLabel}>{question.ratingConfig.lowerLabel}</Text>
-          <Text style={styles.ratingLabel}>{question.ratingConfig.upperLabel}</Text>
+          <Text style={themedStyles.ratingLabel}>{question.ratingConfig.lowerLabel}</Text>
+          <Text style={themedStyles.ratingLabel}>{question.ratingConfig.upperLabel}</Text>
         </View>
       )}
     </View>
   );
 }
 
+// Static styles that don't depend on theme
 const styles = StyleSheet.create({
-  questionContainer: {
-    gap: 16,
-  },
-  questionLabel: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#171717",
-    lineHeight: 24,
-  },
-  questionDescription: {
-    fontSize: 14,
-    color: "#8e8e93",
-    lineHeight: 20,
-    marginTop: -8,
-  },
   ratingContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -233,57 +278,10 @@ const styles = StyleSheet.create({
   hiddenWhileMeasuring: {
     opacity: 0,
   },
-  numberRatingContainer: {
-    flexDirection: "row",
-    borderRadius: 12,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(0, 0, 0, 0.12)",
-    gap: 0,
-  },
-  numberButton: {
-    flex: 1,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#ffffff",
-  },
-  numberButtonDivider: {
-    borderRightWidth: 1,
-    borderRightColor: "rgba(0, 0, 0, 0.12)",
-  },
-  numberButtonSelected: {
-    backgroundColor: "#171717",
-  },
-  numberText: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#171717",
-  },
-  numberTextSelected: {
-    color: "#ffffff",
-  },
-  smileyButton: {
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "rgba(0, 0, 0, 0.12)",
-    backgroundColor: "#ffffff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  smileyButtonSelected: {
-    borderColor: "#171717",
-    borderWidth: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.02)",
-  },
   ratingLabels: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 8,
-  },
-  ratingLabel: {
-    fontSize: 12,
-    color: "#8e8e93",
   },
 });
 

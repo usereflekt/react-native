@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Keyboard,
   ScrollView,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { useTheme } from '../../theme';
 import { SurveyAnswer, SurveyQuestion as SurveyQuestionType, Survey as SurveyType } from '../../types';
 import SurveyQuestion from './question';
 import SurveyPopup from './survey-modal';
@@ -24,11 +25,36 @@ const Survey: React.FC<SurveyProps> = ({
   onClose,
   onSubmit,
 }) => {
+  const theme = useTheme();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<SurveyAnswer[]>([]);
   const [scrollViewHeight, setScrollViewHeight] = useState(0);
   const [isScrollable, setIsScrollable] = useState(false);
   const [contentHeight, setContentHeight] = useState(0);
+
+  // Generate dynamic styles based on theme
+  const themedStyles = useMemo(() => StyleSheet.create({
+    button: {
+      height: 44,
+      paddingHorizontal: 24,
+      borderRadius: theme.borderRadius.button,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    primaryButton: {
+      backgroundColor: theme.colors.primary,
+    },
+    secondaryButtonText: {
+      color: theme.colors.text,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    primaryButtonText: {
+      color: theme.colors.primaryForeground,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  }), [theme]);
 
   const currentQuestion = survey.questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === survey.questions.length - 1;
@@ -177,18 +203,18 @@ const Survey: React.FC<SurveyProps> = ({
           <View style={{...styles.buttons, justifyContent: currentQuestionIndex > 0 ? 'space-between' : 'flex-end'}}>
             {currentQuestionIndex > 0 && (
               <TouchableOpacity
-                style={[styles.button, styles.secondaryButton]}
+                style={[themedStyles.button, styles.secondaryButton]}
                 onPress={handleBack}
               >
-                <Text style={styles.secondaryButtonText}>Back</Text>
+                <Text style={themedStyles.secondaryButtonText}>Back</Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity
-              style={[styles.button, styles.primaryButton, isNextDisabled && styles.buttonDisabled]}
+              style={[themedStyles.button, themedStyles.primaryButton, isNextDisabled && styles.buttonDisabled]}
               onPress={handleNext}
               disabled={isNextDisabled}
             >
-              <Text style={styles.primaryButtonText}>
+              <Text style={themedStyles.primaryButtonText}>
                 {nextLabel}
               </Text>
             </TouchableOpacity>
@@ -199,6 +225,7 @@ const Survey: React.FC<SurveyProps> = ({
   );
 };
 
+// Static styles that don't depend on theme
 const styles = StyleSheet.create({
   scrollView: {
     flexGrow: 0,
@@ -208,87 +235,17 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     paddingHorizontal: 20,
   },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modal: {
-    width: '85%',
-    maxWidth: 360,
-    backgroundColor: '#ffffff',
-    borderRadius: 24,
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 10,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  title: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  closeButton: {
-    fontSize: 22,
-    color: '#8e8e93',
-    paddingLeft: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#8e8e93',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
   footer: {
     paddingTop: 12,
   },
-  progress: {
-    textAlign: 'center',
-    color: '#8e8e93',
-    marginBottom: 10,
-  },
   buttons: {
     flexDirection: 'row',
-  },
-  button: {
-    height: 44,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   buttonDisabled: {
     opacity: 0.5,
   },
   secondaryButton: {
-    borderColor: '#171717',
-    borderWidth: 0,
     marginRight: 8,
-  },
-  primaryButton: {
-    backgroundColor: '#171717',
-  },
-  secondaryButtonText: {
-    color: '#171717',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  primaryButtonText: {
-    color: '#f6f6f6',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
 

@@ -1,13 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { APIClient } from './api/client';
-import { SDKConfig, Survey, SurveyAnswer } from './types';
+import { DEFAULT_THEME, mergeTheme } from './theme';
+import { SDKConfig, Survey, SurveyAnswer, Theme } from './types';
 
 class ReflektSDK {
   private static instance: ReflektSDK | null = null;
   private apiClient: APIClient;
   private config: SDKConfig;
   private surveys: Survey[] = [];
+  private theme: Theme = DEFAULT_THEME;
   private initialized: boolean = false;
 
   private constructor(config: SDKConfig) {
@@ -33,15 +35,21 @@ class ReflektSDK {
 
   private async loadSurveys(): Promise<void> {
     try {
-      const cached = await this.getCachedSurveys();
-      if (cached) {
-        this.surveys = cached;
+      const cachedSurveys = await this.getCachedSurveys();
+      const cachedTheme = await this.getCachedTheme();
+      if (cachedSurveys) {
+        this.surveys = cachedSurveys;
+      }
+      if (cachedTheme) {
+        this.theme = mergeTheme(cachedTheme);
       }
 
-      const surveys = await this.apiClient.fetchActiveSurveys();
+      const { surveys, theme } = await this.apiClient.fetchActiveSurveys();
 
       this.surveys = surveys;
+      this.theme = mergeTheme(theme);
       await this.cacheSurveys(surveys);
+      await this.cacheTheme(this.theme);
     } catch (error) {
       console.error('Failed to load surveys:', error);
     }
@@ -50,6 +58,10 @@ class ReflektSDK {
   async reloadAvailableSurveys(): Promise<Survey[]> {
     await this.loadSurveys();
     return this.getAvailableSurveys();
+  }
+
+  getTheme(): Theme {
+    return this.theme;
   }
 
   async getAvailableSurveys(): Promise<Survey[]> {
@@ -96,11 +108,28 @@ class ReflektSDK {
     }
   }
 
+  private async getCachedTheme(): Promise<Theme | null> {
+    try {
+      const cached = await AsyncStorage.getItem('@theme_cache');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  }
+
   private async cacheSurveys(surveys: Survey[]): Promise<void> {
     try {
       await AsyncStorage.setItem('@surveys_cache', JSON.stringify(surveys));
     } catch (error) {
       console.error('Failed to cache surveys:', error);
+    }
+  }
+
+  private async cacheTheme(theme: Theme): Promise<void> {
+    try {
+      await AsyncStorage.setItem('@theme_cache', JSON.stringify(theme));
+    } catch (error) {
+      console.error('Failed to cache theme:', error);
     }
   }
   

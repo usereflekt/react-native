@@ -1,6 +1,7 @@
-import React from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
-import { SurveyAnswer, SurveyQuestion as SurveyQuestionType } from "../../../types";
+import React, { useMemo } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { useTheme } from "../../../theme";
+import { SurveyQuestion as SurveyQuestionType } from "../../../types";
 
 interface SurveyMessageQuestionProps {
   question: SurveyQuestionType;
@@ -9,32 +10,35 @@ interface SurveyMessageQuestionProps {
 export default function SurveyMessageQuestion({
   question,
 }: SurveyMessageQuestionProps) {
+  const theme = useTheme();
+
+  // Message has slightly different label styling (larger font)
+  const themedStyles = useMemo(() => StyleSheet.create({
+    questionContainer: {
+      gap: 16,
+    },
+    questionLabel: {
+      fontSize: 20,
+      fontWeight: "600",
+      color: theme.colors.text,
+      lineHeight: 28,
+    },
+    questionDescription: {
+      fontSize: 14,
+      color: theme.colors.textSecondary,
+      lineHeight: 20,
+      marginTop: -8,
+    },
+  }), [theme]);
+
   return (
-    <View style={styles.questionContainer}>
-      <Text style={styles.questionLabel}>{question.label}</Text>
+    <View style={themedStyles.questionContainer}>
+      <Text style={themedStyles.questionLabel}>{question.label}</Text>
       {question.description && (
-        <Text style={styles.questionDescription}>{question.description}</Text>
+        <Text style={themedStyles.questionDescription}>{question.description}</Text>
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  questionContainer: {
-    gap: 16,
-  },
-  questionLabel: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#171717",
-    lineHeight: 28,
-  },
-  questionDescription: {
-    fontSize: 14,
-    color: "#8e8e93",
-    lineHeight: 20,
-    marginTop: -8,
-  },
-});
 
 
