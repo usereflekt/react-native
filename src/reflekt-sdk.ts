@@ -94,8 +94,18 @@ class ReflektSDK {
       completedAt: Date.now(),
     };
 
-    // Filter out undefined answers (skipped questions or message questions)
-    const validAnswers = answers.filter((answer): answer is SurveyAnswer => answer !== undefined);
+    // Filter out invalid answers (skipped questions, message questions, or deselected ratings)
+    const validAnswers = answers.filter((answer) => {
+      if (answer === undefined) return false;
+      const value = answer.answer;
+      // Filter out deselected ratings (value 0)
+      if (typeof value === 'number' && value === 0) return false;
+      // Filter out empty strings
+      if (typeof value === 'string' && value.trim() === '') return false;
+      // Filter out empty arrays
+      if (Array.isArray(value) && value.length === 0) return false;
+      return true;
+    });
 
     await this.apiClient.submitResponse(surveyId, this.config.respondentId, validAnswers, metadata);
     
