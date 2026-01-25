@@ -15,7 +15,7 @@ import SurveyPopup from './survey-modal';
 interface SurveyProps {
   survey: SurveyType;
   visible: boolean;
-  onClose: () => void;
+  onClose: (completed?: boolean) => void;
   onSubmit: (answers: SurveyAnswer[]) => void;
 }
 
@@ -113,8 +113,8 @@ const Survey: React.FC<SurveyProps> = ({
   const handleNext = () => {
     Keyboard.dismiss();
     if (isLastQuestion) {
+      onClose(false);
       onSubmit(answers);
-      onClose();
     } else {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }

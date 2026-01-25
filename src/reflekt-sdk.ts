@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { APIClient } from './api/client';
 import { DEFAULT_THEME, mergeTheme } from './theme';
-import { SDKConfig, Survey, SurveyAnswer, Theme } from './types';
+import { ImpressionMetadata, SDKConfig, Survey, SurveyAnswer, Theme } from './types';
 
 class ReflektSDK {
   private static instance: ReflektSDK | null = null;
@@ -11,6 +11,9 @@ class ReflektSDK {
   private surveys: Survey[] = [];
   private theme: Theme = DEFAULT_THEME;
   private initialized: boolean = false;
+  
+  // Track active impressions by surveyId
+  private activeImpressions: Map<string, string> = new Map();
 
   private constructor(config: SDKConfig) {
     this.config = config;
@@ -85,14 +88,81 @@ class ReflektSDK {
     return !hasResponded;
   }
 
-  async submitResponse(surveyId: string, answers: SurveyAnswer[]): Promise<void> {
-    const metadata = {
+  /**
+   * Build impression/response metadata from config
+   */
+  private buildMetadata(): ImpressionMetadata {
+    return {
       platform: Platform.OS,
-      appVersion: this.config.appVersion || 'Unknown', // TODO: Get app version from package.json
-      timestamp: Date.now(),
-      startedAt: Date.now(),
-      completedAt: Date.now(),
+      appVersion: this.config.appVersion || 'Unknown',
     };
+  }
+
+  /**
+   * Called when a survey is shown to the user.
+   * Creates an impression and returns the impressionId.
+   */
+  async recordImpression(surveyId: string): Promise<string> {
+    try {
+      const metadata = this.buildMetadata();
+      const impressionId = await this.apiClient.createImpression(
+        surveyId,
+        this.config.respondentId,
+        metadata
+      );
+      
+      // Store the active impression
+      this.activeImpressions.set(surveyId, impressionId);
+      
+      return impressionId;
+    } catch (error) {
+      console.error('Failed to record impression:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Called when the user dismisses the survey without completing.
+   * If the survey was already submitted, no dismissal is recorded.
+   */
+  async recordDismissal(surveyId: string): Promise<void> {
+    const impressionId = this.activeImpressions.get(surveyId);
+    
+    // No active impression means survey was already submitted or impression failed
+    if (!impressionId) {
+      return;
+    }
+
+    try {
+      await this.apiClient.updateImpression(impressionId, Date.now());
+    } catch (error) {
+      console.error('Failed to record dismissal:', error);
+      // Don't throw - dismissal tracking failure shouldn't break the app
+    } finally {
+      // Clear the active impression regardless of success/failure
+      this.activeImpressions.delete(surveyId);
+    }
+  }
+
+  /**
+   * Get the active impression ID for a survey.
+   */
+  getActiveImpressionId(surveyId: string): string | undefined {
+    return this.activeImpressions.get(surveyId);
+  }
+
+  /**
+   * Submit survey response.
+   * Requires an active impression to have been recorded first.
+   */
+  async submitResponse(surveyId: string, answers: SurveyAnswer[]): Promise<void> {
+    const impressionId = this.activeImpressions.get(surveyId);
+    
+    if (!impressionId) {
+      throw new Error('No active impression found. Call recordImpression() first.');
+    }
+
+    const metadata = this.buildMetadata();
 
     // Filter out invalid answers (skipped questions, message questions, or deselected ratings)
     const validAnswers = answers.filter((answer) => {
@@ -107,7 +177,16 @@ class ReflektSDK {
       return true;
     });
 
-    await this.apiClient.submitResponse(surveyId, this.config.respondentId, validAnswers, metadata);
+    await this.apiClient.submitResponse(
+      surveyId,
+      this.config.respondentId,
+      impressionId,
+      validAnswers,
+      metadata
+    );
+    
+    // Clear the active impression after successful submission
+    this.activeImpressions.delete(surveyId);
     
     await this.markSurveyCompleted(surveyId);
   }

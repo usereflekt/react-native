@@ -71,7 +71,19 @@ export const ReflektProvider: React.FC<ReflektProviderProps> = ({
 
         if (!isMounted) return;
 
-        setActiveSurvey(available[0]);
+        const survey = available[0];
+        
+        // Record impression when survey is shown
+        try {
+          await sdk.recordImpression(survey._id);
+        } catch (error) {
+          if (config.debug) {
+            console.warn("Reflekt: failed to record impression", error);
+          }
+          // Continue showing survey even if impression fails
+        }
+
+        setActiveSurvey(survey);
         setIsVisible(true);
       } catch (error) {
         if (config.debug) {
@@ -111,7 +123,19 @@ export const ReflektProvider: React.FC<ReflektProviderProps> = ({
           return;
         }
 
-        setActiveSurvey(available[0]);
+        const survey = available[0];
+        
+        // Record impression when survey is shown
+        try {
+          await sdk.recordImpression(survey._id);
+        } catch (error) {
+          if (config.debug) {
+            console.warn("Reflekt: failed to record impression", error);
+          }
+          // Continue showing survey even if impression fails
+        }
+
+        setActiveSurvey(survey);
         setIsVisible(true);
       } catch (error) {
         if (config.debug) {
@@ -128,9 +152,21 @@ export const ReflektProvider: React.FC<ReflektProviderProps> = ({
     };
   }, [isReady, config.pollIntervalMinutes, config.debug, activeSurvey, isVisible]);
 
-  const hideSurvey = useCallback(() => {
+  const hideSurvey = useCallback(async (dismissed = true) => {
     setIsVisible(false);
-  }, []);
+    if (activeSurvey && dismissed) {
+      try {
+        const sdk = ReflektSDK.getInstance();
+        await sdk.recordDismissal(activeSurvey._id);
+      } catch (error) {
+        if (config.debug) {
+          console.warn("Reflekt: failed to record dismissal", error);
+        }
+      } finally {
+        setActiveSurvey(null);
+      }
+    }
+  }, [activeSurvey, config.debug]);
 
   const handleSubmit = useCallback(
     async (answers: SurveyAnswer[]) => {

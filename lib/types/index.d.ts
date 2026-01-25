@@ -6,12 +6,10 @@ export interface SDKConfig {
     debug?: boolean;
     pollIntervalMinutes?: number;
 }
-export type ProjectPlatform = "react-native-bare" | "react-native-expo" | "flutter" | "ios" | "android";
 export interface Project {
     name: string;
     slug: string;
     organizationId: string;
-    platforms: ProjectPlatform[];
     theme: Theme;
 }
 export interface ThemeColors {
@@ -79,28 +77,25 @@ export interface SurveyResponseMetadata {
     appVersion: string;
     deviceId?: string;
     locale?: string;
-    timestamp: number;
-    startedAt: number;
-    completedAt: number;
 }
 export interface SurveyResponse {
     surveyId: string;
     respondentId: string;
+    impressionId: string;
     answers: SurveyAnswer[];
     metadata: SurveyResponseMetadata;
 }
-export type ImpressionAction = "shown" | "dismissed" | "completed";
 export interface ImpressionMetadata {
     platform: string;
     appVersion: string;
     deviceId?: string;
     locale?: string;
-    timestamp: number;
 }
 export interface SurveyImpression {
     surveyId: string;
     respondentId?: string;
-    action: ImpressionAction;
+    shownAt: number;
+    dismissedAt?: number;
+    completedAt?: number;
     metadata: ImpressionMetadata;
-    createdAt: number;
 }

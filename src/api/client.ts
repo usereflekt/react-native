@@ -1,5 +1,4 @@
 import {
-  ImpressionAction,
   ImpressionMetadata,
   Survey,
   SurveyAnswer,
@@ -33,12 +32,17 @@ export class APIClient {
     return { surveys: data.surveys, theme: data.theme };
   }
 
+  /**
+   * Submit a survey response.
+   * This also marks the impression as completed on the backend.
+   */
   async submitResponse(
     surveyId: string,
     respondentId: string,
+    impressionId: string,
     answers: SurveyAnswer[],
     metadata: SurveyResponseMetadata
-  ): Promise<void> {
+  ): Promise<string> {
     const response = await fetch(`${this.apiUrl}/response`, {
       method: 'POST',
       headers: {
@@ -48,6 +52,7 @@ export class APIClient {
       body: JSON.stringify({
         surveyId,
         respondentId,
+        impressionId,
         answers,
         metadata,
       }),
@@ -56,14 +61,20 @@ export class APIClient {
     if (!response.ok) {
       throw new Error(`Failed to submit response: ${response.status}`);
     }
+
+    const data = await response.json();
+    return data.responseId;
   }
 
+  /**
+   * Create a new impression when a survey is shown.
+   * Returns the impressionId which must be stored locally.
+   */
   async createImpression(
     surveyId: string,
     respondentId: string,
-    action: ImpressionAction,
     metadata: ImpressionMetadata
-  ): Promise<void> {
+  ): Promise<string> {
     const response = await fetch(`${this.apiUrl}/impression`, {
       method: 'POST',
       headers: {
@@ -73,13 +84,40 @@ export class APIClient {
       body: JSON.stringify({
         surveyId,
         respondentId,
-        action,
         metadata,
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to submit response: ${response.status}`);
+      throw new Error(`Failed to create impression: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.impressionId;
+  }
+
+  /**
+   * Update an existing impression when user dismisses the survey.
+   * Only allowed if the impression has not been completed.
+   */
+  async updateImpression(
+    impressionId: string,
+    dismissedAt: number
+  ): Promise<void> {
+    const response = await fetch(`${this.apiUrl}/impression`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.apiKey,
+      },
+      body: JSON.stringify({
+        impressionId,
+        dismissedAt,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update impression: ${response.status}`);
     }
   }
 
