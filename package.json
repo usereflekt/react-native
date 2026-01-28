@@ -1,9 +1,19 @@
 {
   "name": "@reflekt/react-native",
-  "version": "1.0.0",
-  "description": "In-app survey SDK for React Native",
+  "version": "0.1.0",
+  "description": "In-app survey and feedback SDK for React Native and Expo",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "license": "MIT",
+  "author": "Reflekt",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reflekt-app/reflekt-react-native"
+  },
+  "homepage": "https://github.com/reflekt-app/reflekt-react-native#readme",
+  "bugs": {
+    "url": "https://github.com/reflekt-app/reflekt-react-native/issues"
+  },
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
@@ -14,27 +24,51 @@
     "survey",
     "feedback",
     "react-native",
-    "mobile"
+    "expo",
+    "mobile",
+    "in-app-survey",
+    "user-feedback",
+    "nps"
   ],
-  "peerDependencies": {
-    "react": ">=17.0.0",
-    "react-native": ">=0.64.0"
+  "engines": {
+    "node": ">=16.0.0"
   },
-  "dependencies": {
+  "peerDependencies": {
+    "@react-native-async-storage/async-storage": ">=1.19.0",
     "react": ">=17.0.0",
     "react-native": ">=0.64.0",
-    "react-native-gesture-handler": "^2.29.1",
-    "react-native-reanimated": "^4.1.5",
-    "react-native-svg": "^15.15.0"
+    "react-native-gesture-handler": ">=2.0.0",
+    "react-native-reanimated": ">=3.0.0",
+    "react-native-svg": ">=13.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@react-native-async-storage/async-storage": {
+      "optional": false
+    },
+    "react-native-gesture-handler": {
+      "optional": false
+    },
+    "react-native-reanimated": {
+      "optional": false
+    },
+    "react-native-svg": {
+      "optional": false
+    }
   },
   "devDependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@types/react": "^19.2.5",
     "@types/react-native": "^0.73.0",
+    "react": "^18.2.0",
+    "react-native": "^0.74.0",
+    "react-native-gesture-handler": "^2.29.1",
+    "react-native-reanimated": "^3.16.0",
+    "react-native-svg": "^15.15.0",
     "typescript": "^5.9.3"
   },
   "files": [
     "lib",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ]
 }

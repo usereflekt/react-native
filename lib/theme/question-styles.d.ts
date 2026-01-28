@@ -15,3 +15,4 @@ export interface OptionStyles {
 }
 export declare function createQuestionStyles(theme: Theme): QuestionStyles;
 export declare function createOptionStyles(theme: Theme): OptionStyles;
+//# sourceMappingURL=question-styles.d.ts.map

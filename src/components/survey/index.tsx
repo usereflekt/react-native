@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Keyboard,
+  LayoutChangeEvent,
   ScrollView,
   StyleSheet,
   Text,
@@ -126,18 +127,17 @@ const Survey: React.FC<SurveyProps> = ({
     }
   };
 
-  const handleScrollViewLayout = (event: any) => {
+  const handleScrollViewLayout = (event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
     if (height > 0 && height !== scrollViewHeight) {
       setScrollViewHeight(height);
     }
   };
 
-  const handleContentSizeChange = (_contentWidth: number, contentHeight: number) => {
-    if (contentHeight > 0 && contentHeight !== contentHeight) {
-      return;
+  const handleContentSizeChange = (_contentWidth: number, newContentHeight: number) => {
+    if (newContentHeight > 0 && newContentHeight !== contentHeight) {
+      setContentHeight(newContentHeight);
     }
-    setContentHeight(contentHeight);
   };
 
   useEffect(() => {

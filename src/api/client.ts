@@ -6,12 +6,14 @@ import {
   Theme
 } from '../types';
 
+const DEFAULT_API_URL = 'https://jovial-shepherd-346.convex.site/api';
+
 export class APIClient {
   private apiUrl: string;
   private apiKey: string;
 
-  constructor(apiKey: string) {
-    this.apiUrl = 'https://jovial-shepherd-346.convex.site/api';
+  constructor(apiKey: string, apiUrl?: string) {
+    this.apiUrl = apiUrl || DEFAULT_API_URL;
     this.apiKey = apiKey;
   }
 

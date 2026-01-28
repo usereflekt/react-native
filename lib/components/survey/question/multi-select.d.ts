@@ -7,3 +7,4 @@ interface SurveyMultiSelectQuestionProps {
 }
 export default function SurveyMultiSelectQuestion({ question, answer, onAnswer, }: SurveyMultiSelectQuestionProps): React.JSX.Element;
 export {};
+//# sourceMappingURL=multi-select.d.ts.map

@@ -17,9 +17,13 @@ class ReflektSDK {
 
   private constructor(config: SDKConfig) {
     this.config = config;
-    this.apiClient = new APIClient(config.apiKey);
+    this.apiClient = new APIClient(config.apiKey, config.apiUrl);
   }
 
+  /**
+   * Get the singleton instance of ReflektSDK.
+   * @throws Error if SDK has not been initialized
+   */
   static getInstance(config?: SDKConfig): ReflektSDK {
     if (!ReflektSDK.instance && config) {
       ReflektSDK.instance = new ReflektSDK(config);
@@ -30,10 +34,48 @@ class ReflektSDK {
     return ReflektSDK.instance;
   }
 
+  /**
+   * Initialize the SDK with the provided configuration.
+   * Must be called before using any other SDK methods.
+   */
   static async initialize(config: SDKConfig): Promise<void> {
+    // Reset if already initialized with different config
+    if (ReflektSDK.instance) {
+      ReflektSDK.instance = null;
+    }
     const sdk = ReflektSDK.getInstance(config);
     await sdk.loadSurveys();
     sdk.initialized = true;
+  }
+
+  /**
+   * Reset the SDK instance. Useful when user logs out or
+   * when you need to reinitialize with a different configuration.
+   */
+  static reset(): void {
+    if (ReflektSDK.instance) {
+      ReflektSDK.instance.activeImpressions.clear();
+      ReflektSDK.instance = null;
+    }
+  }
+
+  /**
+   * Check if the SDK has been initialized.
+   */
+  static isInitialized(): boolean {
+    return ReflektSDK.instance?.initialized ?? false;
+  }
+
+  private log(message: string, ...args: unknown[]): void {
+    if (this.config.debug) {
+      console.log(`[Reflekt] ${message}`, ...args);
+    }
+  }
+
+  private logError(message: string, error?: unknown): void {
+    if (this.config.debug) {
+      console.error(`[Reflekt] ${message}`, error);
+    }
   }
 
   private async loadSurveys(): Promise<void> {
@@ -42,6 +84,7 @@ class ReflektSDK {
       const cachedTheme = await this.getCachedTheme();
       if (cachedSurveys) {
         this.surveys = cachedSurveys;
+        this.log('Loaded surveys from cache', cachedSurveys.length);
       }
       if (cachedTheme) {
         this.theme = mergeTheme(cachedTheme);
@@ -53,8 +96,9 @@ class ReflektSDK {
       this.theme = mergeTheme(theme);
       await this.cacheSurveys(surveys);
       await this.cacheTheme(this.theme);
+      this.log('Loaded surveys from API', surveys.length);
     } catch (error) {
-      console.error('Failed to load surveys:', error);
+      this.logError('Failed to load surveys:', error);
     }
   }
 
@@ -113,10 +157,11 @@ class ReflektSDK {
       
       // Store the active impression
       this.activeImpressions.set(surveyId, impressionId);
+      this.log('Recorded impression', surveyId, impressionId);
       
       return impressionId;
     } catch (error) {
-      console.error('Failed to record impression:', error);
+      this.logError('Failed to record impression:', error);
       throw error;
     }
   }
@@ -135,8 +180,9 @@ class ReflektSDK {
 
     try {
       await this.apiClient.updateImpression(impressionId, Date.now());
+      this.log('Recorded dismissal', surveyId);
     } catch (error) {
-      console.error('Failed to record dismissal:', error);
+      this.logError('Failed to record dismissal:', error);
       // Don't throw - dismissal tracking failure shouldn't break the app
     } finally {
       // Clear the active impression regardless of success/failure
@@ -213,7 +259,7 @@ class ReflektSDK {
     try {
       await AsyncStorage.setItem('@surveys_cache', JSON.stringify(surveys));
     } catch (error) {
-      console.error('Failed to cache surveys:', error);
+      this.logError('Failed to cache surveys:', error);
     }
   }
 
@@ -221,7 +267,7 @@ class ReflektSDK {
     try {
       await AsyncStorage.setItem('@theme_cache', JSON.stringify(theme));
     } catch (error) {
-      console.error('Failed to cache theme:', error);
+      this.logError('Failed to cache theme:', error);
     }
   }
   
@@ -247,7 +293,7 @@ class ReflektSDK {
 
       return false;
     } catch (error) {
-      console.error('Failed to check if has responded:', error);
+      this.logError('Failed to check if has responded:', error);
       return false;
     }
   }
@@ -273,7 +319,7 @@ class ReflektSDK {
         await AsyncStorage.removeItem(key);
       }
     } catch (error) {
-      console.error('Failed to sync hasResponded state:', error);
+      this.logError('Failed to sync hasResponded state:', error);
     }
   }
 
@@ -281,8 +327,9 @@ class ReflektSDK {
     try {
       const key = `@survey_completed_${surveyId}`;
       await AsyncStorage.setItem(key, Date.now().toString());
+      this.log('Marked survey as completed', surveyId);
     } catch (error) {
-      console.error('Failed to mark survey as completed:', error);
+      this.logError('Failed to mark survey as completed:', error);
     }
   }
 }

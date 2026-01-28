@@ -7,3 +7,4 @@ interface SurveySingleSelectQuestionProps {
 }
 export default function SurveySingleSelectQuestion({ question, answer, onAnswer, }: SurveySingleSelectQuestionProps): React.JSX.Element;
 export {};
+//# sourceMappingURL=single-select.d.ts.map

@@ -12,3 +12,4 @@ export declare function mergeTheme(partialTheme?: Partial<Theme> & {
     borderRadius?: number | Theme['borderRadius'];
 }): Theme;
 export {};
+//# sourceMappingURL=index.d.ts.map

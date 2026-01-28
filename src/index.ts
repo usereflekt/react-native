@@ -1,7 +1,8 @@
-import { ReflektProvider, useReflekt } from "./components/reflekt-provider";
-import Survey from "./components/survey";
-import ReflektSDK from "./reflekt-sdk";
+// Components
+export { ReflektProvider, useReflekt } from "./components/reflekt-provider";
 
+// SDK
+export { default as ReflektSDK } from "./reflekt-sdk";
+
+// Types
 export * from './types';
-export { ReflektProvider, ReflektSDK, Survey as SurveyModal, useReflekt };
-export default ReflektSDK;

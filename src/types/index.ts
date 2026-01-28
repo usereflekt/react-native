@@ -3,12 +3,20 @@
 // ----------
 
 export interface SDKConfig {
+  /** Your Reflekt API key */
   apiKey: string;
+  /** Unique identifier for the current user/respondent */
   respondentId: string;
+  /** Automatically show surveys when available (default: true) */
   autoShow?: boolean;
+  /** Your app's version string for analytics */
   appVersion?: string;
+  /** Enable debug logging (default: false) */
   debug?: boolean;
-  pollIntervalMinutes?: number; // If <= 0, no background polling is performed. Default is 60 minutes.
+  /** Interval in minutes for polling new surveys. Set to 0 to disable. (default: 60) */
+  pollIntervalMinutes?: number;
+  /** Custom API URL for self-hosted or staging environments */
+  apiUrl?: string;
 }
 
 // -----------------

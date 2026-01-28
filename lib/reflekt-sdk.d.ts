@@ -8,8 +8,27 @@ declare class ReflektSDK {
     private initialized;
     private activeImpressions;
     private constructor();
+    /**
+     * Get the singleton instance of ReflektSDK.
+     * @throws Error if SDK has not been initialized
+     */
     static getInstance(config?: SDKConfig): ReflektSDK;
+    /**
+     * Initialize the SDK with the provided configuration.
+     * Must be called before using any other SDK methods.
+     */
     static initialize(config: SDKConfig): Promise<void>;
+    /**
+     * Reset the SDK instance. Useful when user logs out or
+     * when you need to reinitialize with a different configuration.
+     */
+    static reset(): void;
+    /**
+     * Check if the SDK has been initialized.
+     */
+    static isInitialized(): boolean;
+    private log;
+    private logError;
     private loadSurveys;
     reloadAvailableSurveys(): Promise<Survey[]>;
     getTheme(): Theme;
@@ -47,3 +66,4 @@ declare class ReflektSDK {
     private markSurveyCompleted;
 }
 export default ReflektSDK;
+//# sourceMappingURL=reflekt-sdk.d.ts.map

@@ -1,0 +1,1 @@
+{"version":3,"file":"message.d.ts","sourceRoot":"","sources":["../../../../src/components/survey/question/message.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAkB,MAAM,OAAO,CAAC;AAGvC,OAAO,EAAE,cAAc,IAAI,kBAAkB,EAAE,MAAM,gBAAgB,CAAC;AAEtE,UAAU,0BAA0B;IAClC,QAAQ,EAAE,kBAAkB,CAAC;CAC9B;AAED,MAAM,CAAC,OAAO,UAAU,qBAAqB,CAAC,EAC5C,QAAQ,GACT,EAAE,0BAA0B,qBA8B5B"}

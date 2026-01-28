@@ -2,7 +2,7 @@ import { ImpressionMetadata, Survey, SurveyAnswer, SurveyResponseMetadata, Theme
 export declare class APIClient {
     private apiUrl;
     private apiKey;
-    constructor(apiKey: string);
+    constructor(apiKey: string, apiUrl?: string);
     fetchActiveSurveys(): Promise<{
         surveys: Survey[];
         theme: Theme;
@@ -24,3 +24,4 @@ export declare class APIClient {
     updateImpression(impressionId: string, dismissedAt: number): Promise<void>;
     checkHasResponded(surveyId: string, respondentId: string): Promise<boolean>;
 }
+//# sourceMappingURL=client.d.ts.map

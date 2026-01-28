@@ -1,6 +1,4 @@
-import { ReflektProvider, useReflekt } from "./components/reflekt-provider";
-import Survey from "./components/survey";
-import ReflektSDK from "./reflekt-sdk";
+export { ReflektProvider, useReflekt } from "./components/reflekt-provider";
+export { default as ReflektSDK } from "./reflekt-sdk";
 export * from './types';
-export { ReflektProvider, ReflektSDK, Survey as SurveyModal, useReflekt };
-export default ReflektSDK;
+//# sourceMappingURL=index.d.ts.map

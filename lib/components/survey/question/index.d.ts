@@ -6,3 +6,4 @@ export interface SurveyQuestionProps {
     onAnswer: (answer: SurveyAnswer) => void;
 }
 export default function SurveyQuestion({ question, answer, onAnswer, }: SurveyQuestionProps): React.JSX.Element | null;
+//# sourceMappingURL=index.d.ts.map
