@@ -53,7 +53,13 @@ export const ReflektProvider: React.FC<ReflektProviderProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [config]);
+  }, [
+    config.apiKey,
+    config.respondentId,
+    config.appVersion,
+    config.debug,
+    config.apiUrl,
+  ]);
 
   // Auto-show survey if available
   useEffect(() => {

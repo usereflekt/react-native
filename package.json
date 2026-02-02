@@ -17,8 +17,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "prepare": "npm run build",
-    "test": "jest"
+    "prepare": "npm run build"
   },
   "keywords": [
     "survey",
@@ -67,8 +66,10 @@
     "typescript": "^5.9.3"
   },
   "files": [
-    "lib",
+    "lib/**/*.js",
+    "lib/**/*.d.ts",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE"
   ]
 }

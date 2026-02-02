@@ -78,6 +78,11 @@ class ReflektSDK {
     }
   }
 
+  private getCompletedKey(surveyId: string) {
+    const safeRespondentId = encodeURIComponent(this.config.respondentId);
+    return `@survey_completed_${surveyId}_${safeRespondentId}`;
+  }
+
   private async loadSurveys(): Promise<void> {
     try {
       const cachedSurveys = await this.getCachedSurveys();
@@ -199,13 +204,13 @@ class ReflektSDK {
 
   /**
    * Submit survey response.
-   * Requires an active impression to have been recorded first.
+   * Creates an impression if one isn't active yet.
    */
   async submitResponse(surveyId: string, answers: SurveyAnswer[]): Promise<void> {
-    const impressionId = this.activeImpressions.get(surveyId);
-    
+    let impressionId = this.activeImpressions.get(surveyId);
+
     if (!impressionId) {
-      throw new Error('No active impression found. Call recordImpression() first.');
+      impressionId = await this.recordImpression(surveyId);
     }
 
     const metadata = this.buildMetadata();
@@ -273,7 +278,7 @@ class ReflektSDK {
   
   private async checkHasResponded(surveyId: string): Promise<boolean> {
     try {
-      const key = `@survey_completed_${surveyId}`;
+      const key = this.getCompletedKey(surveyId);
       const value = await AsyncStorage.getItem(key);
       const localHasResponded = !!value;
 
@@ -315,7 +320,7 @@ class ReflektSDK {
       if (remoteHasResponded) {
         await this.markSurveyCompleted(surveyId);
       } else {
-        const key = `@survey_completed_${surveyId}`;
+        const key = this.getCompletedKey(surveyId);
         await AsyncStorage.removeItem(key);
       }
     } catch (error) {
@@ -325,7 +330,7 @@ class ReflektSDK {
 
   private async markSurveyCompleted(surveyId: string): Promise<void> {
     try {
-      const key = `@survey_completed_${surveyId}`;
+      const key = this.getCompletedKey(surveyId);
       await AsyncStorage.setItem(key, Date.now().toString());
       this.log('Marked survey as completed', surveyId);
     } catch (error) {
