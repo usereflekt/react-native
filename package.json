@@ -8,11 +8,11 @@
   "author": "Reflekt",
   "repository": {
     "type": "git",
-    "url": "https://github.com/reflekt-app/reflekt-react-native"
+    "url": "https://github.com/usereflekt/react-native.git"
   },
-  "homepage": "https://github.com/reflekt-app/reflekt-react-native#readme",
+  "homepage": "https://github.com/usereflekt/react-native#readme",
   "bugs": {
-    "url": "https://github.com/reflekt-app/reflekt-react-native/issues"
+    "url": "https://github.com/usereflekt/react-native/issues"
   },
   "scripts": {
     "build": "tsc",

@@ -107,4 +107,3 @@ export interface SurveyImpression {
     completedAt?: number;
     metadata: ImpressionMetadata;
 }
-//# sourceMappingURL=index.d.ts.map

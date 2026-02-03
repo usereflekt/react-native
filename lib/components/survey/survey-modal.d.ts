@@ -8,4 +8,3 @@ interface SurveyPopupProps {
 }
 declare const SurveyPopup: React.FC<SurveyPopupProps>;
 export default SurveyPopup;
-//# sourceMappingURL=survey-modal.d.ts.map

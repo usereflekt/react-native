@@ -7,4 +7,3 @@ interface SurveyFreeTextQuestionProps {
 }
 export default function SurveyFreeTextQuestion({ question, answer, onAnswer, }: SurveyFreeTextQuestionProps): React.JSX.Element;
 export {};
-//# sourceMappingURL=free-text.d.ts.map

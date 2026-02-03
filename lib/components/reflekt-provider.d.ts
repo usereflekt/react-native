@@ -10,4 +10,3 @@ type ReflektProviderProps = {
 export declare const ReflektProvider: React.FC<ReflektProviderProps>;
 export declare const useReflekt: () => ReflektContextValue;
 export {};
-//# sourceMappingURL=reflekt-provider.d.ts.map

@@ -5,4 +5,3 @@ interface SurveyMessageQuestionProps {
 }
 export default function SurveyMessageQuestion({ question, }: SurveyMessageQuestionProps): React.JSX.Element;
 export {};
-//# sourceMappingURL=message.d.ts.map

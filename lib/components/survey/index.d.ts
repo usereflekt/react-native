@@ -8,4 +8,3 @@ interface SurveyProps {
 }
 declare const Survey: React.FC<SurveyProps>;
 export default Survey;
-//# sourceMappingURL=index.d.ts.map

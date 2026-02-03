@@ -7,4 +7,3 @@ interface SurveyRatingQuestionProps {
 }
 export default function SurveyRatingQuestion({ question, answer, onAnswer }: SurveyRatingQuestionProps): React.JSX.Element;
 export {};
-//# sourceMappingURL=rating.d.ts.map

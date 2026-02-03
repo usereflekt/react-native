@@ -24,4 +24,3 @@ export declare class APIClient {
     updateImpression(impressionId: string, dismissedAt: number): Promise<void>;
     checkHasResponded(surveyId: string, respondentId: string): Promise<boolean>;
 }
-//# sourceMappingURL=client.d.ts.map

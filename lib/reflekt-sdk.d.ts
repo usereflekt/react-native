@@ -29,6 +29,7 @@ declare class ReflektSDK {
     static isInitialized(): boolean;
     private log;
     private logError;
+    private getCompletedKey;
     private loadSurveys;
     reloadAvailableSurveys(): Promise<Survey[]>;
     getTheme(): Theme;
@@ -54,7 +55,7 @@ declare class ReflektSDK {
     getActiveImpressionId(surveyId: string): string | undefined;
     /**
      * Submit survey response.
-     * Requires an active impression to have been recorded first.
+     * Creates an impression if one isn't active yet.
      */
     submitResponse(surveyId: string, answers: SurveyAnswer[]): Promise<void>;
     private getCachedSurveys;
@@ -66,4 +67,3 @@ declare class ReflektSDK {
     private markSurveyCompleted;
 }
 export default ReflektSDK;
-//# sourceMappingURL=reflekt-sdk.d.ts.map
