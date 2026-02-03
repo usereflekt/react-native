@@ -24,7 +24,6 @@ Add the Reanimated Babel plugin to your `babel.config.js`:
 
 ```js
 module.exports = {
-  presets: ['module:@react-native/babel-preset'],
   plugins: ['react-native-reanimated/plugin'],
 };
 ```
@@ -175,14 +174,6 @@ The SDK supports the following question types:
 2. Check that you have active surveys in your Reflekt dashboard
 3. Enable `debug: true` to see detailed logs
 4. Verify the `respondentId` hasn't already completed the survey
-
-### Reanimated errors
-
-Make sure you've added the Babel plugin and rebuilt your app:
-
-```bash
-npx react-native start --reset-cache
-```
 
 ## License
 
