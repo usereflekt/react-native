@@ -4,6 +4,8 @@ import { APIClient } from './api/client';
 import { DEFAULT_THEME, mergeTheme } from './theme';
 import { ImpressionMetadata, SDKConfig, Survey, SurveyAnswer, Theme } from './types';
 
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
 class ReflektSDK {
   private static instance: ReflektSDK | null = null;
   private apiClient: APIClient;
@@ -245,7 +247,15 @@ class ReflektSDK {
   private async getCachedSurveys(): Promise<Survey[] | null> {
     try {
       const cached = await AsyncStorage.getItem('@surveys_cache');
-      return cached ? JSON.parse(cached) : null;
+      if (!cached) return null;
+
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp > CACHE_TTL_MS) {
+        this.log('Surveys cache is stale, ignoring');
+        return null;
+      }
+
+      return data;
     } catch {
       return null;
     }
@@ -254,7 +264,15 @@ class ReflektSDK {
   private async getCachedTheme(): Promise<Theme | null> {
     try {
       const cached = await AsyncStorage.getItem('@theme_cache');
-      return cached ? JSON.parse(cached) : null;
+      if (!cached) return null;
+
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp > CACHE_TTL_MS) {
+        this.log('Theme cache is stale, ignoring');
+        return null;
+      }
+
+      return data;
     } catch {
       return null;
     }
@@ -262,7 +280,8 @@ class ReflektSDK {
 
   private async cacheSurveys(surveys: Survey[]): Promise<void> {
     try {
-      await AsyncStorage.setItem('@surveys_cache', JSON.stringify(surveys));
+      const entry = JSON.stringify({ data: surveys, timestamp: Date.now() });
+      await AsyncStorage.setItem('@surveys_cache', entry);
     } catch (error) {
       this.logError('Failed to cache surveys:', error);
     }
@@ -270,7 +289,8 @@ class ReflektSDK {
 
   private async cacheTheme(theme: Theme): Promise<void> {
     try {
-      await AsyncStorage.setItem('@theme_cache', JSON.stringify(theme));
+      const entry = JSON.stringify({ data: theme, timestamp: Date.now() });
+      await AsyncStorage.setItem('@theme_cache', entry);
     } catch (error) {
       this.logError('Failed to cache theme:', error);
     }
