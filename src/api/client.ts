@@ -6,7 +6,7 @@ import {
   Theme
 } from '../types';
 
-const DEFAULT_API_URL = 'https://amiable-beagle-282.convex.site/api';
+const DEFAULT_API_URL = 'https://useful-sardine-877.eu-west-1.convex.site/api';
 
 export class APIClient {
   private apiUrl: string;
